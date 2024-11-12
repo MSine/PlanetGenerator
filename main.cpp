@@ -1,8 +1,11 @@
 #include "main.h"
 
 
+GLuint programID = 0;
+
 static void render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glUseProgram(programID);
     glLoadIdentity();
         glTranslated(0,0,-10);
 
@@ -35,6 +38,15 @@ int main(int argc, char** argv) {
 	glutInitWindowPosition(100, 100);
 	glutInitWindowSize(1600, 900);
 	glutCreateWindow("PlanetGenerator");
+
+    GLenum err = glewInit();
+    if (GLEW_OK != err) {
+        /* Problem: glewInit failed, something is seriously wrong. */
+        fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
+    }
+    fprintf(stdout, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
+
+    programID = LoadShaders( "src/Shader.vert", "src/Shader.frag" );
 	
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
