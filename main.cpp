@@ -7,19 +7,20 @@ unsigned int SCR_WIDTH = 1280;
 unsigned int SCR_HEIGHT = 720;
 
 // camera
-Camera camera(glm::vec3(0.0f, 0.0f, 10.0f));
+Camera camera;
 Shader shader;
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
+bool firstMouse = true;
 
 Mesh mesh;
 
-static void render() {
+void render() {
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // pass projection matrix to shader (note that in this case it could change every frame)
-    glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(45.f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
     shader.setMat4("projection", projection);
 
     // camera/view transformation
@@ -35,6 +36,38 @@ static void resizeWindow(int width, int height) {
 	SCR_WIDTH = (width == 0) ? 1 : width;
     SCR_HEIGHT = (height == 0) ? 1 : height;
     glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+}
+
+void mouseDrag(int xposIn, int yposIn) {
+    float xpos = (float)(xposIn);
+    float ypos = (float)(yposIn);
+
+    if (firstMouse) {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = ypos - lastY;
+
+    lastX = xpos;
+    lastY = ypos;
+
+    camera.ProcessMouseMovement(xoffset, yoffset);
+    glutPostRedisplay();
+}
+
+void mouse(int button, int state, int x, int y) {
+    if ((button == 3) || (button == 4)) {
+        camera.ProcessMouseScroll(button == 3);
+    }
+    else {
+        if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
+            firstMouse = true;
+        }
+    }
+    glutPostRedisplay();
 }
 
 int main(int argc, char** argv) {
@@ -62,9 +95,11 @@ int main(int argc, char** argv) {
     glClearColor(0,0,0,0);
 	glutDisplayFunc(render);
 	glutReshapeFunc(resizeWindow);
+    glutMotionFunc(mouseDrag);
+    glutMouseFunc(mouse);
 
     shader.use();
-    mesh.init(2.f, 10);
+    mesh.init(1.f, 30);
 
 	glutMainLoop();
     return 0;
