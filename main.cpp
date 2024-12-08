@@ -99,7 +99,7 @@ int main(int argc, char** argv) {
     glutMouseFunc(mouse);
 
     shader.use();
-    mesh.init(1.f, 30);
+    mesh.init(1.f, 100);
 
 	glutMainLoop();
     return 0;

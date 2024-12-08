@@ -9,6 +9,13 @@ void Mesh::Draw(Shader& shader) {
     glBindVertexArray(0);
 }
 
+void Mesh::recalcColors() {
+    for (int v = 0; v < vertices.size(); v++) {
+        float dist = glm::length(vertices[v].position);
+        vertices[v].color = colorGradient.getColor(dist);
+    }
+}
+
 // Res is the amount of faces on each side of cube before normalization
 void Mesh::initSphere(float radius, int res) {
     if (res < 1)
@@ -19,7 +26,7 @@ void Mesh::initSphere(float radius, int res) {
         y = 2 * (float)j / res - 1;
         for (int i = 0; i <= res; i++) {
             x = 2 * (float)i / res - 1;
-            vertices.emplace_back(glm::normalize(glm::vec3(x, y, -1.f)) * radius);
+            vertices.emplace_back(glm::vec3(x, y, -1.f) * radius);  // Normalize
 
             if (i < res && j < res) {
                 indices.emplace_back(i + j * (res + 1));

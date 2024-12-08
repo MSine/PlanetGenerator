@@ -7,9 +7,9 @@
 
 //#include <glm/gtc/matrix_transform.hpp>
 
-#include <iostream>
-#include "Shader.hpp"
 #include <vector>
+#include "Gradient.hpp"
+#include "Shader.hpp"
 
 /*
  * https://learnopengl.com/ uses shaders and buffers
@@ -36,13 +36,26 @@ public:
     Mesh() {}
     void init(float radius, int res) {
         initSphere(radius, res);
+        addStop(1.f, glm::vec3(0.f, 0.f, 1.f));
+        addStop(1.1f, glm::vec3(1.f, 1.f, 0.f));
+        addStop(1.3f, glm::vec3(0.f, 1.f, 0.f));
+        addStop(1.6f, glm::vec3(0.7f, 0.3f, 0.f));
+        addStop(1.7f, glm::vec3(1.f, 1.f, 1.f));
+        recalcColors();
         initBuffers();
     }
+
+    void addStop(float distance, const glm::vec3& color) {
+        colorGradient.addStop(distance, color);
+    }
+
+    void recalcColors();
 
     void Draw(Shader &shader);
 
 private:
     unsigned int VBO, EBO;
+    ColorGradient colorGradient;
 
     void initSphere(float radius, int res);
     void initBuffers();
