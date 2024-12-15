@@ -1,9 +1,7 @@
 #include "Mesh.h"
 
 
-// render the mesh
-void Mesh::Draw(Shader& shader) {
-    // draw mesh
+void Mesh::draw(Shader& shader) {
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
@@ -16,17 +14,38 @@ void Mesh::recalcColors() {
     }
 }
 
-// Res is the amount of faces on each side of cube before normalization
-void Mesh::initSphere(float radius, int res) {
-    if (res < 1)
-        res = 1;
+void Mesh::recalcNormals() {
+    // http://meshlabstuff.blogspot.com/2009/04/on-computation-of-vertex-normals.html First approach
+    // Create shared normals based on areas of triangles
+    for (int i = 0; i < indices.size(); i += 6) {
+        glm::vec3 uVec(vertices[indices[i + 1]].position - vertices[indices[i]].position);
+        glm::vec3 ruVec(vertices[indices[i + 2]].position - vertices[indices[i]].position);
+        glm::vec3 rVec(vertices[indices[i + 5]].position - vertices[indices[i]].position);
+        
+        glm::vec3 t1Norm = glm::cross(ruVec, uVec);
+        glm::vec3 t2Norm = glm::cross(rVec, ruVec);
 
+        vertices[indices[i]].normal += t1Norm;
+        vertices[indices[i + 1]].normal += t1Norm;
+        vertices[indices[i + 2]].normal += t1Norm;
+
+        vertices[indices[i + 3]].normal += t2Norm;
+        vertices[indices[i + 4]].normal += t2Norm;
+        vertices[indices[i + 5]].normal += t2Norm;
+    }
+    // Normalize all normals
+    for (int v = 0; v < vertices.size(); v++) {
+        vertices[v].normal = glm::normalize(vertices[v].normal);
+    }
+}
+
+void Mesh::initSphere(float radius) {
     float x, y;
     for (int j = 0; j <= res; j++) {
         y = 2 * (float)j / res - 1;
         for (int i = 0; i <= res; i++) {
             x = 2 * (float)i / res - 1;
-            vertices.emplace_back(glm::vec3(x, y, -1.f) * radius);  // Normalize
+            vertices.emplace_back(glm::normalize(glm::vec3(x, y, -1.f)) * radius);  // Normalize
 
             if (i < res && j < res) {
                 indices.emplace_back(i + j * (res + 1));
@@ -50,7 +69,7 @@ void Mesh::initSphere(float radius, int res) {
     for (int i = 0; i < indexSize; ++i) {
         indices.push_back(startIndex + indices[i]);
     }
-    // build +X face by swapping x=>z, y=>y, z=>-x
+    // +X face by swapping x=>z, y=>y, z=>-x
     startIndex = vertices.size();
     for (int i = 0; i < vertexSize; i++) {
         vertices.emplace_back(glm::vec3(-vertices[i].position.z, vertices[i].position.y, vertices[i].position.x));
@@ -58,7 +77,7 @@ void Mesh::initSphere(float radius, int res) {
     for (int i = 0; i < indexSize; ++i) {
         indices.push_back(startIndex + indices[i]);
     }
-    // build -X face by swapping x=>-z, y=>y, z=>x
+    // -X face by swapping x=>-z, y=>y, z=>x
     startIndex = vertices.size();
     for (int i = 0; i < vertexSize; i++) {
         vertices.emplace_back(glm::vec3(vertices[i].position.z, vertices[i].position.y, -vertices[i].position.x));
@@ -66,7 +85,7 @@ void Mesh::initSphere(float radius, int res) {
     for (int i = 0; i < indexSize; ++i) {
         indices.push_back(startIndex + indices[i]);
     }
-    // build +Y face by swapping x=>x, y=>-z, z=>y
+    // +Y face by swapping x=>x, y=>-z, z=>y
     startIndex = vertices.size();
     for (int i = 0; i < vertexSize; i++) {
         vertices.emplace_back(glm::vec3(vertices[i].position.x, -vertices[i].position.z, vertices[i].position.y));
@@ -74,7 +93,7 @@ void Mesh::initSphere(float radius, int res) {
     for (int i = 0; i < indexSize; ++i) {
         indices.push_back(startIndex + indices[i]);
     }
-    // build +Y face by swapping x=>x, y=>z, z=>-y
+    // +Y face by swapping x=>x, y=>z, z=>-y
     startIndex = vertices.size();
     for (int i = 0; i < vertexSize; i++) {
         vertices.emplace_back(glm::vec3(vertices[i].position.x, vertices[i].position.z, -vertices[i].position.y));

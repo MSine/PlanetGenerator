@@ -17,13 +17,17 @@ public:
         updateCameraVectors();
     }
 
+    glm::vec3 getPosition() const {
+        return position;
+    }
+
     // returns the view matrix calculated using Euler Angles and the LookAt Matrix
-    glm::mat4 GetViewMatrix() const {
+    glm::mat4 getViewMatrix() const {
         return glm::lookAt(position, target, glm::vec3(0.0f, 1.0f, 0.0f));
     }
 
     // processes input received from a mouse input system. Expects the offset value in both the x and y direction.
-    void ProcessMouseMovement(float xoffset, float yoffset) {
+    void processMouseMovement(float xoffset, float yoffset) {
         xoffset *= sensitivity;
         yoffset *= sensitivity;
 
@@ -39,7 +43,7 @@ public:
     }
 
     // processes input received from a mouse scroll-wheel event
-    void ProcessMouseScroll(bool isUp) {
+    void processMouseScroll(bool isUp) {
         distance = isUp ? distance / zoomSpeed : distance * zoomSpeed;
         if (distance < minDistance)
             distance = minDistance;

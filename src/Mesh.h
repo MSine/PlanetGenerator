@@ -23,7 +23,7 @@ struct Vertex {
     glm::vec3 normal;
     glm::vec3 color;
 
-    Vertex(glm::vec3 pos) : position(pos), normal(0), color(0.9) {}
+    Vertex(glm::vec3 pos) : position(pos), normal(0), color(1) {}
 };
 
 
@@ -34,14 +34,16 @@ public:
     unsigned int VAO;
 
     Mesh() {}
-    void init(float radius, int res) {
-        initSphere(radius, res);
+    void init(float radius, int desRes) {
+        res = desRes < 1 ? 1 : desRes;  // Min 1 resolution
+        initSphere(radius);
         addStop(1.f, glm::vec3(0.f, 0.f, 1.f));
         addStop(1.1f, glm::vec3(1.f, 1.f, 0.f));
         addStop(1.3f, glm::vec3(0.f, 1.f, 0.f));
         addStop(1.6f, glm::vec3(0.7f, 0.3f, 0.f));
         addStop(1.7f, glm::vec3(1.f, 1.f, 1.f));
         recalcColors();
+        recalcNormals();
         initBuffers();
     }
 
@@ -50,14 +52,16 @@ public:
     }
 
     void recalcColors();
+    void recalcNormals();
 
-    void Draw(Shader &shader);
+    void draw(Shader &shader);
 
 private:
+    unsigned int res;       // Res is the amount of faces on each side of cube before normalization
     unsigned int VBO, EBO;
     ColorGradient colorGradient;
 
-    void initSphere(float radius, int res);
+    void initSphere(float radius);
     void initBuffers();
 };
 

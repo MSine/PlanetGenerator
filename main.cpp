@@ -9,11 +9,12 @@ unsigned int SCR_HEIGHT = 720;
 // camera
 Camera camera;
 Shader shader;
+glm::vec3 lightPos(0.f, 0.f, -10.f);
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 
-Mesh mesh;
+Mesh planet;
 
 void render() {
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -24,10 +25,13 @@ void render() {
     shader.setMat4("projection", projection);
 
     // camera/view transformation
-    glm::mat4 view = camera.GetViewMatrix();
-    shader.setMat4("view", view);
+    shader.setMat4("view", camera.getViewMatrix());
 
-    mesh.Draw(shader);
+    shader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+    shader.setVec3("lightPos", lightPos);
+    shader.setVec3("viewPos", camera.getPosition());
+
+    planet.draw(shader);
 
     glFlush();
 }
@@ -54,13 +58,13 @@ void mouseDrag(int xposIn, int yposIn) {
     lastX = xpos;
     lastY = ypos;
 
-    camera.ProcessMouseMovement(xoffset, yoffset);
+    camera.processMouseMovement(xoffset, yoffset);
     glutPostRedisplay();
 }
 
 void mouse(int button, int state, int x, int y) {
     if ((button == 3) || (button == 4)) {
-        camera.ProcessMouseScroll(button == 3);
+        camera.processMouseScroll(button == 3);
     }
     else {
         if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
@@ -86,8 +90,8 @@ int main(int argc, char** argv) {
 
     shader.init("src/shader.vert", "src/shader.frag");
 	
-    //glEnable(GL_CULL_FACE);
-    //glCullFace(GL_BACK);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
@@ -99,7 +103,7 @@ int main(int argc, char** argv) {
     glutMouseFunc(mouse);
 
     shader.use();
-    mesh.init(1.f, 100);
+    planet.init(1.f, 100);
 
 	glutMainLoop();
     return 0;
