@@ -10,11 +10,29 @@ unsigned int SCR_HEIGHT = 720;
 Camera camera;
 Shader shader;
 glm::vec3 lightPos(0.f, 0.f, -10.f);
+glm::vec3 lightColor(1.f, 1.f, 1.f);
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 
 Mesh planet;
+
+void createPlanet() {
+    planet.init(1.f, 100);
+
+    // Add noise layers
+    planet.recalcNormals();
+
+    // Add coloring     height, color
+        planet.addStop(1.f, glm::vec3(0.f, 0.f, 1.f));
+        planet.addStop(1.1f, glm::vec3(1.f, 1.f, 0.f));
+        planet.addStop(1.3f, glm::vec3(0.f, 1.f, 0.f));
+        planet.addStop(1.6f, glm::vec3(0.7f, 0.3f, 0.f));
+        planet.addStop(1.7f, glm::vec3(1.f, 1.f, 1.f));
+    planet.recalcColors();
+
+    planet.initBuffers();
+}
 
 void render() {
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -27,7 +45,7 @@ void render() {
     // camera/view transformation
     shader.setMat4("view", camera.getViewMatrix());
 
-    shader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+    shader.setVec3("lightColor", lightColor);
     shader.setVec3("lightPos", lightPos);
     shader.setVec3("viewPos", camera.getPosition());
 
@@ -103,7 +121,7 @@ int main(int argc, char** argv) {
     glutMouseFunc(mouse);
 
     shader.use();
-    planet.init(1.f, 100);
+    createPlanet();
 
 	glutMainLoop();
     return 0;

@@ -37,14 +37,6 @@ public:
     void init(float radius, int desRes) {
         res = desRes < 1 ? 1 : desRes;  // Min 1 resolution
         initSphere(radius);
-        addStop(1.f, glm::vec3(0.f, 0.f, 1.f));
-        addStop(1.1f, glm::vec3(1.f, 1.f, 0.f));
-        addStop(1.3f, glm::vec3(0.f, 1.f, 0.f));
-        addStop(1.6f, glm::vec3(0.7f, 0.3f, 0.f));
-        addStop(1.7f, glm::vec3(1.f, 1.f, 1.f));
-        recalcColors();
-        recalcNormals();
-        initBuffers();
     }
 
     void addStop(float distance, const glm::vec3& color) {
@@ -53,6 +45,7 @@ public:
 
     void recalcColors();
     void recalcNormals();
+    void initBuffers();
 
     void draw(Shader &shader);
 
@@ -62,7 +55,6 @@ private:
     ColorGradient colorGradient;
 
     void initSphere(float radius);
-    void initBuffers();
 };
 
 #endif
