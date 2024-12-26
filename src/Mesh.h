@@ -44,7 +44,9 @@ public:
         colorGradient.addStop(distance, color);
     }
 
-    void applyNoise(float amplitude, float frequency, float roughness, float rigidity, int seed);
+    void addContinents(float amplitude, float frequency, float roughness, int layerCount, int seed);
+    void addMountains(float amplitude, float frequency, float roughness, int layerCount, int seed);
+    void setOceanLevel(float height);
     void recalcColors();
     void recalcNormals();
     void initBuffers();
