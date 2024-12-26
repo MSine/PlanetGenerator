@@ -18,17 +18,18 @@ bool firstMouse = true;
 Mesh planet;
 
 void createPlanet() {
-    planet.init(1.f, 100);
+    planet.init(1.f, 200);
 
     // Add noise layers
+        planet.applyNoise(0.3f, 3.0f, 1.5f, 0.8f, 123);
     planet.recalcNormals();
 
     // Add coloring     height, color
         planet.addStop(1.f, glm::vec3(0.f, 0.f, 1.f));
-        planet.addStop(1.1f, glm::vec3(1.f, 1.f, 0.f));
-        planet.addStop(1.3f, glm::vec3(0.f, 1.f, 0.f));
-        planet.addStop(1.6f, glm::vec3(0.7f, 0.3f, 0.f));
-        planet.addStop(1.7f, glm::vec3(1.f, 1.f, 1.f));
+        planet.addStop(1.001f, glm::vec3(1.f, 1.f, 0.f));
+        planet.addStop(1.05f, glm::vec3(0.f, 1.f, 0.f));
+        planet.addStop(1.2f, glm::vec3(0.7f, 0.3f, 0.f));
+        planet.addStop(1.5f, glm::vec3(1.f, 1.f, 1.f));
     planet.recalcColors();
 
     planet.initBuffers();

@@ -4,6 +4,7 @@
 #include <GL/glew.h>
 #include <GL/glut.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/noise.hpp>
 
 //#include <glm/gtc/matrix_transform.hpp>
 
@@ -43,6 +44,7 @@ public:
         colorGradient.addStop(distance, color);
     }
 
+    void applyNoise(float amplitude, float frequency, float roughness, float rigidity, int seed);
     void recalcColors();
     void recalcNormals();
     void initBuffers();

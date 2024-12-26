@@ -7,6 +7,43 @@ void Mesh::draw(Shader& shader) {
     glBindVertexArray(0);
 }
 
+
+void Mesh::applyNoise(float amplitude, float frequency, float roughness, float rigidity, int seed) {
+    float baseRadius = 1.0f; // Base radius for sea level
+    float minRadius = 0.7f * baseRadius; // Deepest ocean level
+    float maxRadius = 2.f * baseRadius; // Highest mountain peak
+
+    for (auto& vertex : vertices) {
+        glm::vec3 seedOffset(seed, seed, seed);
+        float rawNoise = glm::perlin(vertex.position * frequency + seedOffset);
+
+        // Apply roughness and rigidity
+        float noiseValue = pow(abs(rawNoise), roughness) * (rawNoise > 0 ? 1 : -1) * rigidity;
+
+        // Scale noise for smoother transitions
+        noiseValue = glm::smoothstep(-1.0f, 1.0f, noiseValue) * 2.0f - 1.0f; // Range [-1, 1]
+        float adjustedNoise = noiseValue * amplitude;
+
+        // Calculate true radius
+        float trueRadius = baseRadius + adjustedNoise;
+
+        // Clamp true radius to ocean and mountain ranges
+        trueRadius = glm::clamp(trueRadius, minRadius, maxRadius);
+
+        // Flatten oceans to baseRadius for smooth surface
+        float finalRadius = (trueRadius < baseRadius) ? baseRadius : trueRadius;
+
+        // Update vertex position and recalculate normals
+        glm::vec3 normal = glm::normalize(vertex.position);
+        vertex.position = normal * finalRadius;
+    }
+
+    // Update vertex buffer
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(Vertex), &vertices[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
 void Mesh::recalcColors() {
     for (int v = 0; v < vertices.size(); v++) {
         float dist = glm::length(vertices[v].position);

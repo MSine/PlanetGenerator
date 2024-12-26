@@ -10,7 +10,6 @@
 #include <iostream>
 
 
-// An abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL
 class Camera {
 public:
     Camera(float distance = 10.0f, float yaw = 0.0f, float pitch = 0.0f) : distance(distance), yaw(yaw), pitch(pitch) {
@@ -21,9 +20,8 @@ public:
         return position;
     }
 
-    // returns the view matrix calculated using Euler Angles and the LookAt Matrix
     glm::mat4 getViewMatrix() const {
-        return glm::lookAt(position, target, glm::vec3(0.0f, 1.0f, 0.0f));
+        return glm::lookAt(position, target, cameraUp);
     }
 
     // processes input received from a mouse input system. Expects the offset value in both the x and y direction.
@@ -60,14 +58,15 @@ private:
     }
 
     glm::vec3 target = glm::vec3(0.f);
+    glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
     glm::vec3 position;
     float distance;    // Distance from the target
     float yaw;         // Horizontal rotation around the target
     float pitch;       // Vertical rotation, constrained to avoid poles
     float sensitivity = 0.2f;   // Mouse sensitivity for smoother movement
-    float zoomSpeed = 1.1f;      // Speed of zooming in/out
-    float minDistance = 2.f;
-    float maxDistance = 50.f;
+    float zoomSpeed = 1.1f;     // Speed of zooming in/out
+    float minDistance = 2.f;    // Minimum distance the camera will be at from origin
+    float maxDistance = 50.f;   // Maximum distance the camera will be at from origin
 };
 #endif
 
